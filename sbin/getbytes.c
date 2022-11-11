@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* Print out a specific range of bytes from the input file/stream.
  * For use with kiraindex.  In order to preserve a simple input
