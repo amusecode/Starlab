@@ -272,9 +272,9 @@ local inline void add_plummer_friction(dyn *b,
 	continue_factor=1.0/(1+exp(10-sqrt(square(dx))/rhalf*10));
       }
 
-    real beta = 1.6*continue_factor;	 // calibration from N-body experiments
+    real local_beta = 1.6*continue_factor;	 // calibration from N-body experiments
 
-    real ffac = beta*40*M_PI*p_density*mass;	// assume logLamda = 10
+    real ffac = local_beta*40*M_PI*p_density*mass;	// assume logLamda = 10
     real X = speed/sigma2;
 
     vec da = 0, dj = 0;
@@ -425,8 +425,8 @@ local inline real plummer_virial(dyn *b)
 //
 //-------------------------------------------------------------------------
 
-static real beta = 0;				// tunable parameter;
-void set_friction_beta(real b) {beta = b;}	// BT say beta = 1
+static real dynamical_fiction_beta = 0;				// tunable parameter;
+void set_friction_beta(real b) {dynamical_fiction_beta = b;}	// BT say beta = 1
 
 static real Mfric = 0;				// cluster effective mass
 void set_friction_mass(real m) {Mfric = m;}
@@ -474,7 +474,7 @@ local inline real pl_logLambda(dyn *b, real r)
     // Only case where this is meaningful is the power-law field.
 
     real LogLambda;
-    if (beta <= 0 || !b->get_pl())
+    if (dynamical_fiction_beta <= 0 || !b->get_pl())
 	LogLambda = 0;
 
     if (mass_unit <= 0)				// no physical mass scale
@@ -510,7 +510,7 @@ void set_friction_acc(dyn *b,			// root node
     // density (even though the cluster mass may be defined using
     // multiple external fields).
 
-    if (beta > 0) {
+    if (dynamical_fiction_beta > 0) {
 
 	real A = b->get_pl_coeff();
 	if (A <= 0) return;
@@ -534,7 +534,7 @@ void set_friction_acc(dyn *b,			// root node
 	real V = abs(Vcm);
 	real X = V/sigma2;			// scaled velocity; BT p. 425
 
-	real coeff = 4*M_PI*beta*pl_logLambda(b, r);
+	real coeff = 4*M_PI*dynamical_fiction_beta*pl_logLambda(b, r);
 	real ffac = coeff * Mfric * pl_density(b, r);
 
 	if (X > 0.1)
@@ -557,7 +557,7 @@ void set_friction_acc(dyn *b,			// root node
 
 #if 1
 	cerr << "  set_friction_acc: "; PRL(Afric);
-	PRI(2); PRC(A); PRC(a); PRL(beta);
+	PRI(2); PRC(A); PRC(a); PRL(dynamical_fiction_beta);
 	PRI(2); PRC(coeff); PRC(Mfric); PRL(pl_density(b, r));
 	PRI(2); PRC(r); PRC(sigma2); PRC(V); PRL(X);
 	PRI(2); PRL((erf(X) - 2*X*exp(-X*X)/sqrt(M_PI)) * pow(V, -3));

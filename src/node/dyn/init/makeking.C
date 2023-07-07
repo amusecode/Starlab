@@ -92,7 +92,7 @@ real g[NG+1];
 
 // Rescaling factors:
 
-real beta = 0.0;
+real local_beta = 0.0;
 real beta_w0 = 0.0;
 real scale_fac = 1.0;
 
@@ -583,7 +583,7 @@ void setvel(dyn * b, real p)
 
 	int il = 0; 
 	int iu = (int)((NG/YMAX) * sqrt(-p));	// Binning OK for W0 < 16,
-						// *only* if beta >= 0.
+						// *only* if local_beta >= 0.
 	if (iu > NG) iu = NG;
       
 	real rl = 0;
@@ -724,7 +724,7 @@ local void makeking(dyn * b, int n, real w0, bool n_flag, bool u_flag, int test)
     real rvirial = -0.5/pot;
 
     cerr << endl << "King model";
-    cerr << "\n    w0 = " << w0 << "  beta = " << beta << "  nprof =" << nprof
+    cerr << "\n    w0 = " << w0 << "  beta = " << local_beta << "  nprof =" << nprof
 	 <<        "  V20/sig2 = " << v20
 	 <<        "  Mc/M = " << zmcore << endl
          <<   "    Rt/Rc = " << rr[nprof] << " (c = " << log10(rr[nprof])
@@ -847,7 +847,7 @@ local void makeking(dyn * b, int n, real w0, bool n_flag, bool u_flag, int test)
     }
 }
 
-main(int argc, char ** argv)
+int main(int argc, char ** argv)
 {
     int  n;
     int  input_seed, actual_seed;
@@ -876,7 +876,7 @@ main(int argc, char ** argv)
     while ((c = pgetopt(argc, argv, param_string,
 		    "$Revision$", _SRC_)) != -1)
         switch(c) {
-            case 'b': beta = atof(poptarg);
+            case 'b': local_beta = atof(poptarg);
                       break;
             case 'c': c_flag = true;
                       comment = poptarg;
@@ -910,12 +910,12 @@ main(int argc, char ** argv)
         exit(1);
     }
 
-    if (beta >= 1) {
+    if (local_beta >= 1) {
         cerr << "makeking: beta < 1 required\n";
         exit(1);
     }
 
-    beta_w0 = beta*w0;			// global variables!
+    beta_w0 = local_beta*w0;			// global variables!
     scale_fac = exp(beta_w0);
 
 //    if (!n_flag && test != 1 && test != 2) {
