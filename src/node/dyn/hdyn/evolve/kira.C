@@ -347,8 +347,8 @@ local bool check_sync(hdyn* b, int max_count = N_CHECK)
 #if 1
 	    // Optionally synchronize it now.
 
-	    cerr << "check_sync: synchronizing node " << bb->format_label()
-		 << endl;
+	    //cerr << "check_sync: synchronizing node " << bb->format_label()
+	    //     << endl;
 	    bb->synchronize_node(false);    // see note at end of hdyn_ev.C
 #endif
 	}
